@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/brijeshshah13/url-shortener/proto";
+
+message Request {
+    string originalURL = 1;
+}
+
+message Response {
+    string encodedShortURL = 1;
+}
+
+service UrlShortener {
+    rpc GetEncodedShortURL(Request) returns (Response);
+}
