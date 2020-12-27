@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 
-	"github.com/brijeshshah13/url-shortener/client/model"
+	"github.com/brijeshshah13/url-shortener/services/frontend/model"
 	"github.com/gin-gonic/gin"
 )
 

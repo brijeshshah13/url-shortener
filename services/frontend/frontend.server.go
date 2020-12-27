@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/brijeshshah13/url-shortener/internal/proto/shortener"
+	"github.com/brijeshshah13/url-shortener/services/frontend/controller"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing-contrib/go-gin/ginhttp"
 	"github.com/opentracing/opentracing-go"
@@ -38,6 +39,11 @@ func (s *Frontend) Run(port int) error {
 		ctx.String(http.StatusOK, "Ok")
 	})
 
+	urlGroup := router.Group("api/v1/url-shortener")
+	{
+		urlGroup.POST("/create", controller.Create)
+	}
+
 	// start the server on port 9090
 	err := router.Run(fmt.Sprintf(":%d", port))
 
@@ -47,10 +53,6 @@ func (s *Frontend) Run(port int) error {
 
 	return err
 
-	// mux := trace.NewServeMux(s.tracer)
-	// mux.Handle("/status", http.HandlerFunc(s.statusHandler))
-
-	// return http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
 }
 
 // func (s *Frontend) statusHandler(w http.ResponseWriter, r *http.Request) {
