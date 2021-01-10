@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	services "github.com/brijeshshah13/url-shortener"
 	"github.com/brijeshshah13/url-shortener/internal/dialer"
 	"github.com/brijeshshah13/url-shortener/internal/trace"
+	frontend "github.com/brijeshshah13/url-shortener/services/frontend"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 )
@@ -35,7 +35,7 @@ func main() {
 	switch os.Args[1] {
 	case "shortener":
 	case "frontend":
-		srv = services.NewFrontend(
+		srv = frontend.NewFrontend(
 			tracer,
 			initGRPCConn(*shorteneraddr, tracer),
 		)
