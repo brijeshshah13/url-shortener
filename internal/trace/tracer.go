@@ -1,30 +1,30 @@
 package trace
 
 import (
-	"fmt"
-	"time"
+	"log"
 
-	opentracing "github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-client-go/config"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/trace/jaeger"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-// New creates a new Jaeger tracer
-func New(serviceName, host string) (opentracing.Tracer, error) {
-	cfg := config.Configuration{
-		Sampler: &config.SamplerConfig{
-			Type:  "const",
-			Param: 1,
-		},
-		Reporter: &config.ReporterConfig{
-			LogSpans:            false,
-			BufferFlushInterval: 1 * time.Second,
-			LocalAgentHostPort:  host,
-		},
-	}
-
-	tracer, _, err := cfg.New(serviceName)
+// InitTracer creates a new trace provider instance and registers it as global trace provider.
+func InitTracer(serviceName, host string) func() {
+	// Create and install Jaeger export pipeline.
+	flush, err := jaeger.InstallNewPipeline(
+		jaeger.WithCollectorEndpoint("http://localhost:14268/api/traces"),
+		jaeger.WithProcess(jaeger.Process{
+			ServiceName: serviceName,
+			Tags: []attribute.KeyValue{
+				attribute.String("exporter", "jaeger"),
+				attribute.Float64("float", 312.23),
+			},
+		}),
+		jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("new tracer error: %v", err)
+		log.Fatal(err)
 	}
-	return tracer, nil
+	// otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	return flush
 }

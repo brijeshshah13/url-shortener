@@ -3,8 +3,8 @@ package dialer
 import (
 	"fmt"
 
-	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
-	opentracing "github.com/opentracing/opentracing-go"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
@@ -12,9 +12,9 @@ import (
 type DialOption func(name string) (grpc.DialOption, error)
 
 // WithTracer traces rpc calls
-func WithTracer(t opentracing.Tracer) DialOption {
+func WithTracer(t trace.Tracer) DialOption {
 	return func(name string) (grpc.DialOption, error) {
-		return grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(t)), nil
+		return grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()), nil
 	}
 }
 

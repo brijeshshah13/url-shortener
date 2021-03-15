@@ -7,9 +7,10 @@ import (
 	"os"
 
 	"github.com/brijeshshah13/url-shortener/internal/dialer"
-	"github.com/brijeshshah13/url-shortener/internal/trace"
+	tracer "github.com/brijeshshah13/url-shortener/internal/trace"
 	frontend "github.com/brijeshshah13/url-shortener/services/frontend"
-	"github.com/opentracing/opentracing-go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
@@ -25,10 +26,10 @@ func main() {
 	)
 	flag.Parse()
 
-	tracer, err := trace.New("search", *jaegeraddr)
-	if err != nil {
-		log.Fatalf("trace new error: %v", err)
-	}
+	flush := tracer.InitTracer(os.Args[1], *jaegeraddr)
+	defer flush()
+
+	tracer := otel.Tracer(os.Args[1])
 
 	var srv server
 
@@ -46,7 +47,7 @@ func main() {
 	srv.Run(*port)
 }
 
-func initGRPCConn(addr string, tracer opentracing.Tracer) *grpc.ClientConn {
+func initGRPCConn(addr string, tracer trace.Tracer) *grpc.ClientConn {
 	conn, err := dialer.Dial(addr, dialer.WithTracer(tracer))
 	if err != nil {
 		panic(fmt.Sprintf("ERROR: dial error: %v", err))
