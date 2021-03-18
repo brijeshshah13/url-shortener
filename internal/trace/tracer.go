@@ -17,7 +17,6 @@ func InitTracer(serviceName, host string) func() {
 			ServiceName: serviceName,
 			Tags: []attribute.KeyValue{
 				attribute.String("exporter", "jaeger"),
-				attribute.Float64("float", 312.23),
 			},
 		}),
 		jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
