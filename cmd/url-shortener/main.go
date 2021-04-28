@@ -8,7 +8,9 @@ import (
 
 	"github.com/brijeshshah13/url-shortener/internal/dialer"
 	tracer "github.com/brijeshshah13/url-shortener/internal/trace"
+	"github.com/brijeshshah13/url-shortener/models/dbs"
 	frontend "github.com/brijeshshah13/url-shortener/services/frontend"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
@@ -39,6 +41,7 @@ func main() {
 		srv = frontend.NewFrontend(
 			tracer,
 			initGRPCConn(*shorteneraddr, tracer),
+			initDBConn(dbs.DBNames["main"]),
 		)
 	default:
 		log.Fatalf("unknown command %s", os.Args[1])
@@ -51,6 +54,14 @@ func initGRPCConn(addr string, tracer trace.Tracer) *grpc.ClientConn {
 	conn, err := dialer.Dial(addr, dialer.WithTracer(tracer))
 	if err != nil {
 		panic(fmt.Sprintf("ERROR: dial error: %v", err))
+	}
+	return conn
+}
+
+func initDBConn(dbName string) *mongo.Database {
+	conn, err := dbs.ConnectDB(dbName)
+	if err != nil {
+		panic(fmt.Sprintf("ERROR: db conn error: %v", err))
 	}
 	return conn
 }

@@ -24,5 +24,25 @@ func Create(ctx *gin.Context) {
 		})
 		return
 	}
+
+	// TODO: to uncomment below code once ready for use
+	// urlOptions := struct {
+	// 	is_active bool
+	// 	is_used   bool
+	// }{
+	// 	is_active: true,
+	// 	is_used:   false,
+	// }
+
+	// urlData := struct {
+	// 	original_url    string
+	// 	expiration_date int64
+	// 	is_used         bool
+	// }{
+	// 	original_url:    url.OriginalURL,
+	// 	expiration_date: time.Now().UTC().UnixNano() / 1e6,
+	// 	is_used:         true,
+	// }
+
 	ctx.String(http.StatusOK, url.OriginalURL)
 }
